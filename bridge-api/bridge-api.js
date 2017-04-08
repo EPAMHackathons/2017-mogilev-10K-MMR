@@ -113,7 +113,37 @@ module.exports = {
             let producer = getProducer(filmInfo);
             return rutracker.getTorrents(filmInfo.title, filmInfo.release_date.slice(0, 4), producer);
         });
-    }
+    },
+
+    searchMovies: (people, genres) => {
+        return movieApi.getAllGenres().then((loadedGenres) => {
+            let queryPersons = [];
+            let promises = [];
+            people.forEach(person => {
+                promises.push(movieApi.getPeople(person).then((resp) => {
+                    if (resp.results.length > 0)
+                        queryPersons.push(resp.results[0].id);
+                }))
+            });
+
+            let queryGenres = [];
+            if (genres && genres.length > 0) {
+                genres.forEach(name =>{
+                    let temp = loadedGenres.genres.filter(g => g.name == name);
+                    if(temp && temp.length == 1){
+                        queryGenres.push(temp[0].id)
+                    }
+                })
+            }
+
+            return Promise.all(promises).then(() => {
+                return movieApi.getFilms({
+                    with_genres: queryGenres,
+                    with_people: queryPersons
+                });
+            });
+        })
+    },
 
 };
 
