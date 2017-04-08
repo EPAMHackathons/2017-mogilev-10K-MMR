@@ -133,10 +133,9 @@ bot.dialog('/фильм', function (session) {
         let attachments = films.results.map((film) => {
             return new builder.HeroCard(session)
                 .title(film.title)
-                .subtitle('Оригинальное название: ' + film.original_title)
-                .text(film.overview)
+                .text(`Описание: ${film.overview.slice(0, 40)}...`)
                 .images([
-                    builder.CardImage.create(session, film.poster_path)
+                    builder.CardImage.create(session, films.storage_host_url + film.poster_path)
                 ])
                 .buttons([
                     builder.CardAction.openUrl(session, "http://onlinemultfilmy.ru/lego-zvezdnye-vojny-xroniki-jody/", "Скачать Торрент"),
@@ -145,6 +144,7 @@ bot.dialog('/фильм', function (session) {
 
         let msg = new builder.Message(session)
             .textFormat(builder.TextFormat.xml)
+            .attachmentLayout(builder.AttachmentLayout.carousel)
             .attachments(attachments);
 
         if (films.length > 1) {
