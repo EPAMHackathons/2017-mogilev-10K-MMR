@@ -43,6 +43,11 @@ function movieApi() {
     return callHttp(url);
   }
 
+  self.getAllGenres = function () {
+    let url = urlGenerator.getAllGenresUrl();
+    return callHttp(url);
+  }
+
   return self;
 }
 

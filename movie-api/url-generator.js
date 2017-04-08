@@ -11,6 +11,10 @@ function UrlGenerator() {
     return getUrl('movie', parse);
   }
 
+  self.getAllGenresUrl = function () {
+    return getUrl('genre/movie/list', '');
+  }
+
   return self;
 }
 
