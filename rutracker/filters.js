@@ -8,6 +8,11 @@ module.exports.filter = (films) => {
 
     let results = [];
 
+    let BluRay = getFilmByQuality(filteredFimls, "Blu-ray");
+    if (BluRay) {
+        addFilmIntoResult(results, BluRay, "Blu-ray");
+    }
+
     let bdRip = getFilmByQuality(filteredFimls, "BDRip");
     if (bdRip) {
         addFilmIntoResult(results, bdRip, "BDRip");

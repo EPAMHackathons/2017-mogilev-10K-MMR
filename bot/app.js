@@ -6,7 +6,7 @@ var bridgeApi = require('../bridge-api/bridge-api');
 //=========================================================
 // Setup Restify Server
 var server = restify.createServer();
-server.listen(process.env.port || process.env.PORT || 8880, function () {
+server.listen(process.env.port || process.env.PORT || 8080, function () {
     console.log('%s listening to %s', server.name, server.url);
 });
 // Create chat bot
@@ -62,6 +62,10 @@ bot.beginDialogAction('помощь', '/помощь', {
 
 bot.beginDialogAction('меню', '/меню', {
     matches: /^меню|показать меню/i
+});
+
+bot.beginDialogAction('фильм', '/фильм', {
+    matches: /^фильм/i
 });
 
 //=========================================================
@@ -125,13 +129,16 @@ bot.dialog('/помощь', [
     matches: /^помощь|помоги|cписок команд|команды/i
 });
 // фильм терминатор
+// фильм социальная сеть
 bot.dialog('/фильм', [function (session) {
     let filmName = (session.message.text.toLowerCase().slice(6, session.message.text.length));
     let choice = '';
 
-    bridge.getMovies(filmName).then((films) => {
+    bridgeApi.getMovies({
+        name: filmName
+    }).then((films) => {
         let attachments = films.results.map((film) => {
-            choice = choice.concat(`select:${film.id}|`);
+            choice = choice.concat(`${film.title} (${film.id})|`);
 
             return new builder.HeroCard(session)
                 .title(film.title)
@@ -140,7 +147,7 @@ bot.dialog('/фильм', [function (session) {
                     builder.CardImage.create(session, films.storage_host_url + film.poster_path)
                 ])
                 .buttons([
-                    builder.CardAction.imBack(session, `select:${film.id}`, "Список торрентов")
+                    builder.CardAction.imBack(session, `${film.title} (${film.id})`, "Список торрентов")
                 ]);
         });
 
@@ -148,35 +155,29 @@ bot.dialog('/фильм', [function (session) {
 
         let msg = new builder.Message(session)
             .textFormat(builder.TextFormat.xml)
-            .attachmentLayout(builder.AttachmentLayout.carousel)
             .attachments(attachments);
 
-    let msg = new builder.Message(session)
-        .textFormat(builder.TextFormat.xml)
-        .attachments(attachments);
+        if (films.results.length > 1) {
+            msg.attachmentLayout(builder.AttachmentLayout.carousel)
+        }
 
-        // builder.Prompts.choice(session, msg, "select:100|select:101|select:102");
         builder.Prompts.choice(session, msg, choice);
     })
 }, function (session, results) {
     var action, item;
-    var kvPair = results.response.entity.split(':');
-    switch (kvPair[0]) {
-        case 'select':
-            action = 'selected';
-            break;
-    }
 
-    let filmId = kvPair[1];
+    let filmName = results.response.entity;
+    let splitedName = filmName.split(' ');
+    let filmId = splitedName[splitedName.length - 1].slice(1, splitedName[splitedName.length - 1].length - 1);
 
-    bridge.getTorrents(filmId).then(torrents => {
+    bridgeApi.getTorrents(filmId).then(torrents => {
         let msg = '';
 
         torrents.forEach(t => {
             msg = msg.concat(`Качество: ${t.quality}, размер: ${t.data.size}, ссылка: ${t.data.url}, сиды: ${t.data.seeds}\n\n`)
         });
 
-        builder.Prompts.text(session, msg);
+        session.endConversation(msg);
     });
 }]);
 
@@ -309,18 +310,18 @@ let getGenres = () => {
 //     // });
 // });
 
-bridgeApi.getAllUsers().then(result => {
-    console.log(result);
-});
+// bridgeApi.getAllUsers().then(result => {
+//     console.log(result);
+// });
 
 // bridgeApi.getMovies('звездные').then(response => {
 //     console.log(response);
 // });
 
-// bridgeApi.getUserData(1, 2).then(result => {
-//     console.log(result);
-// });
-
-bridgeApi.removeUserData(1, 2).then(result => {
+bridgeApi.getUserData(1, 2).then(result => {
     console.log(result);
 });
+
+// bridgeApi.removeUserData(1, 2).then(result => {
+//     console.log(result);
+// });
