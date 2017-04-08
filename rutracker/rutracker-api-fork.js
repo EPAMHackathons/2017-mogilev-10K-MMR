@@ -24,38 +24,43 @@ function RutrackerApi(data) {
 RutrackerApi.prototype = new EventEmitter();
 
 RutrackerApi.prototype.login = function (username, password) {
-    var postData = querystring.stringify({
-        login_username: username || this.username,
-        login_password: password || this.password,
-        login: 'Вход'
-    });
+    return new Promise((resolve, reject) => {
+        var postData = querystring.stringify({
+            login_username: username || this.username,
+            login_password: password || this.password,
+            login: 'Вход'
+        });
 
-    var options = {
-        hostname: this.host,
-        port: 80,
-        path: this.login_path,
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Content-Length': postData.length
-        }
-    };
+        var options = {
+            hostname: this.host,
+            port: 80,
+            path: this.login_path,
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Length': postData.length
+            }
+        };
 
-    var that = this;
-    var req = http.request(options, function (res) {
-        if (res.statusCode == '302') {
-            that.cookie = res.headers['set-cookie'][0];
-            that.emit('login');
-        } else {
-            that.emit('login-error');
-        }
-    });
+        var that = this;
+        var req = http.request(options, function (res) {
+            if (res.statusCode == '302') {
+                that.cookie = res.headers['set-cookie'][0];
+                that.emit('login');
+                resolve();
+            } else {
+                that.emit('login-error');
+                reject('login-error');
+            }
+        });
 
-    req.on('error', function (err) {
-        that.emit('error', err);
-    });
-    req.write(postData);
-    req.end();
+        req.on('error', function (err) {
+            that.emit('error', err);
+            reject('error');
+        });
+        req.write(postData);
+        req.end();
+    })
 };
 
 RutrackerApi.prototype.search = function (_query, _callback) {
@@ -66,8 +71,8 @@ RutrackerApi.prototype.search = function (_query, _callback) {
             throw TypeError('Expected at least one argument');
         }
 
-        var callback = () => {
-                resolve();
+        var callback = (res) => {
+                resolve(res);
             },
             query = encodeURIComponent(_query),
             path = this.search_path + '?nm=' + query;
@@ -200,4 +205,4 @@ RutrackerApi.prototype.parseSearch = function (rawHtml, callback) {
     }
 };
 
-module.exports = RutrackerApi; 
+module.exports = RutrackerApi;
