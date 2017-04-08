@@ -7,8 +7,7 @@ function UrlGenerator() {
   }
 
   self.getFilmsUrlById = function (id) {
-    let parse = String(id);
-    return getUrl('movie', parse);
+    return getUrl(`movie/${id}`, '');
   }
 
   self.getAllGenresUrl = function () {
@@ -33,7 +32,7 @@ function UrlGenerator() {
 
     function parseParamsArray(arr) {
       let result = "";
-      if (arr.length > 0) {
+      if (arr && arr.length > 0) {
         arr.forEach((x, index) => {
           result += String(x);
           if (index !== arr.length - 1) {
