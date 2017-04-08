@@ -25,7 +25,8 @@ api.getAllGenres()
   });
 
 api.getFilms({
-  with_genres: [12, 28]
+  with_genres: [12, 28],
+  with_people: [85, 1606548]
 })
   .then((data) => {
     console.log(data);
