@@ -1,6 +1,6 @@
 module.exports.filter = (films) => {
     let filteredFimls = films.filter(film => {
-        return (film.category.contains('Фильмы') || film.category.contains('Зарубежное кино')) &&
+        return (film.category.contains('Фильмы') || film.category.contains('Зарубежное кино') || film.category.contains('Наше кино')) &&
             film.state == 'проверено' &&
             !film.category.contains('iPhone') &&
             !film.category.contains('Apple')
@@ -18,6 +18,15 @@ module.exports.filter = (films) => {
         addFilmIntoResult(results, hDRip, "HDRip");
     }
 
+    let dvdRip = getFilmByQuality(filteredFimls, "DVDRip");
+    if (dvdRip) {
+        addFilmIntoResult(results, dvdRip, "DVDRip");
+    }
+
+    let webDL = getFilmByQuality(filteredFimls, "WEB-DL");
+    if (webDL) {
+        addFilmIntoResult(results, webDL, "WEB-DL");
+    }
     return results;
 }
 
@@ -42,6 +51,43 @@ function addFilmIntoResult(results, film, quality) {
             seeds: film.seeds
         }
     });
+}
+
+function addAdditionalTorrents(results) {
+    if (results.length == 0) {
+        let dvd = getFilmByQuality(filteredFimls, "DVD");
+        if (dvd) {
+            addFilmIntoResult(results, dvd, "DVD");
+        }
+    }
+
+    if (results.length == 0) {
+        let tvRip = getFilmByQuality(filteredFimls, "TVRip");
+        if (tvRip) {
+            addFilmIntoResult(results, tvRip, "TVRip");
+        }
+    }
+
+    if (results.length == 0) {
+        let tvRip = getFilmByQuality(filteredFimls, "TVRip");
+        if (tvRip) {
+            addFilmIntoResult(results, tvRip, "TVRip");
+        }
+    }
+
+    if (results.length == 0) {
+        let tv = getFilmByQuality(filteredFimls, "TV");
+        if (tv) {
+            addFilmIntoResult(results, tv, "TV");
+        }
+    }
+
+    if (results.length == 0) {
+        let webDl = getFilmByQuality(filteredFimls, "WEB-DLRip");
+        if (webDl) {
+            addFilmIntoResult(results, webDl, "WEB-DLRip");
+        }
+    }
 }
 
 

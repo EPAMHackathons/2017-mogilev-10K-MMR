@@ -1,7 +1,7 @@
 let getTorrents = require('./rutracker').getTorrents;
 
 
-getTorrents("Социальная сеть", 2010, "Финчер").then(res => {
+getTorrents("Притяжение", 2017, "Бондарчук").then(res => {
     console.log(res);
 })
 
