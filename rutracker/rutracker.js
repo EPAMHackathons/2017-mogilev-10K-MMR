@@ -6,7 +6,7 @@ let userName = 'hackathon-n';
 let pass = 'OBLIVION';
 
 module.exports = {
-    getTorrents: function(title, year, producer) {
+    getTorrents: function (title, year, producer) {
         return Promise.resolve(true).then(() => {
             return rutrackerApi.login(userName, pass);
         }).then(() => {
@@ -23,5 +23,15 @@ module.exports = {
             console.log(err);
             return [];
         })
+    },
+
+    getProducer: function (filmInfo) {
+        if (filmInfo.creds && filmInfo.creds.crew) {
+            let producers = filmInfo.creds.crew.filter(cred => cred.job == "Director");
+            if (producers && producers.length == 1) {
+                return producers.name.substring(producers.name.lastIndexOf(" ") + 1);
+            }
+        }
     }
+
 }
