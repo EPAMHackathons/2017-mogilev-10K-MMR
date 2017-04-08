@@ -1,3 +1,4 @@
+
 let urlGenerator = require('./url-generator');
 let http = require('http');
 let request = require('request');
@@ -15,27 +16,17 @@ function callHttp(url) {
     });
   });
 }
+let mockFilms = require('./mock-films');
+
 
 function movieApi() {
+
   let self = this;
 
   self.getFilms = function (params) {
-    let url = '';
-    if (params.name) {
-      url = urlGenerator.getFilmsUrlByName(params.name);
-    }
-    if (params.id) {
-      url = urlGenerator.getFilmsUrlById(params.id);
-    }
-    if (url.length === 0) {
-      url = urlGenerator.getFilmsByParams(params);
-    }
-    return callHttp(url);
-  }
-
-  self.getAllGenres = function () {
-    let url = urlGenerator.getAllGenresUrl();
-    return callHttp(url);
+    return new Promise(function (resolve, reject) {
+      resolve(mockFilms);
+    })
   }
 
   self.getSimilar = function (id) {
@@ -44,6 +35,7 @@ function movieApi() {
   }
 
   return self;
+
 }
 
 module.exports = new movieApi();

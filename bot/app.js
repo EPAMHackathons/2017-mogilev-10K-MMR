@@ -1,12 +1,12 @@
 var restify = require('restify');
 var builder = require('botbuilder');
-var bridge = require('../bridge-api/bridge-api');
+var bridgeApi = require('../bridge-api/bridge-api');
 //=========================================================
 // Bot Setup
 //=========================================================
 // Setup Restify Server
 var server = restify.createServer();
-server.listen(process.env.port || process.env.PORT || 8080, function () {
+server.listen(process.env.port || process.env.PORT || 8880, function () {
     console.log('%s listening to %s', server.name, server.url);
 });
 // Create chat bot
@@ -90,8 +90,7 @@ bot.dialog('/', [
         session.send("Ok... See you later!");
     }
 ]);
-// session.message.agent
-// session.message.user.id||name
+
 bot.dialog('/меню', [
     function (session) {
         let userMessage = session.message.text.toLowerCase();
@@ -152,9 +151,9 @@ bot.dialog('/фильм', [function (session) {
             .attachmentLayout(builder.AttachmentLayout.carousel)
             .attachments(attachments);
 
-        if (films.length > 1) {
-            msg.attachmentLayout(builder.AttachmentLayout.carousel);
-        }
+    let msg = new builder.Message(session)
+        .textFormat(builder.TextFormat.xml)
+        .attachments(attachments);
 
         // builder.Prompts.choice(session, msg, "select:100|select:101|select:102");
         builder.Prompts.choice(session, msg, choice);
@@ -177,12 +176,11 @@ bot.dialog('/фильм', [function (session) {
 
 bot.dialog('/жанры', function (session) {
     let msg = 'Доступные жанры:';
+    let genres = getGenres().map(g => g.name);
 
-    getGenres().then(genres => {
-        genres.map(g => g.name).forEach(name => msg = msg.concat(`\n\n${name}`));
-        builder.Prompts.text(session, msg);
-    })
+    genres.forEach(name => msg = msg.concat(`\n\n${name}`));
 
+    builder.Prompts.text(session, msg);
 }).triggerAction({
     matches: /^жанры/i
 });
@@ -191,7 +189,7 @@ bot.dialog('/жанры', function (session) {
  * @param {string} filmName 
  */
 let getFilms = (filmName) => {
-    let films = [{
+    return [{
         "poster_path": "https://image.tmdb.org/t/p/w640/ikUhOSuKOd9Sjf6dVP585lFtiLb.jpg",
         "adult": false,
         "overview": "Во времена гражданской войны Галактическая империя угрожала подавить народное восстание с помощью совершенного оружия: Звезды смерти. Принцесса Лиа и повстанческий альянс одержали важную победу, но праздновать некогда. Чтобы избежать преследования за уничтожение Звезды смерти они принимают решение эвакуироваться на секретную базу, которая находится на Хоте…",
@@ -212,13 +210,14 @@ let getFilms = (filmName) => {
         "vote_count": 11,
         "video": false,
         "vote_average": 5.9
-    }];
-
-    return new Promise(resolve => resolve(films));
+    }]
 }
 
+/**
+ * 
+ */
 let getGenres = () => {
-    let genres = [{
+    return [{
             "id": 28,
             "name": "боевик"
         },
@@ -294,7 +293,28 @@ let getGenres = () => {
             "id": 37,
             "name": "вестерн"
         }
-    ];
-
-    return new Promise(resolve => resolve(genres));
+    ]
 }
+
+// bridgeApi.registerUser(1, 2, {}).then(result => {
+//     console.log(result);
+//     // bridgeApi.getUser(1).then(result => {
+//     //     console.log(result);
+//     // });
+// });
+
+bridgeApi.getAllUsers().then(result => {
+    console.log(result);
+});
+
+// bridgeApi.getMovies('звездные').then(response => {
+//     console.log(response);
+// });
+
+// bridgeApi.getUserData(1, 2).then(result => {
+//     console.log(result);
+// });
+
+bridgeApi.removeUserData(1, 2).then(result => {
+    console.log(result);
+});
