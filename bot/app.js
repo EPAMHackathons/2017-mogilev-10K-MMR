@@ -126,11 +126,14 @@ bot.dialog('/помощь', [
     matches: /^помощь|помоги|cписок команд|команды/i
 });
 // фильм терминатор
-bot.dialog('/фильм', function (session) {
+bot.dialog('/фильм', [function (session) {
     let filmName = (session.message.text.toLowerCase().slice(6, session.message.text.length));
+    let choice = '';
 
     bridge.getMovies(filmName).then((films) => {
         let attachments = films.results.map((film) => {
+            choice = choice.concat(`select:${film.id}|`);
+
             return new builder.HeroCard(session)
                 .title(film.title)
                 .text(`Описание: ${film.overview.slice(0, 40)}...`)
@@ -138,9 +141,11 @@ bot.dialog('/фильм', function (session) {
                     builder.CardImage.create(session, films.storage_host_url + film.poster_path)
                 ])
                 .buttons([
-                    builder.CardAction.openUrl(session, "http://onlinemultfilmy.ru/lego-zvezdnye-vojny-xroniki-jody/", "Скачать Торрент"),
-                ])
+                    builder.CardAction.imBack(session, `select:${film.id}`, "Список торрентов")
+                ]);
         });
+
+        choice = choice.slice(0, choice.length - 1);
 
         let msg = new builder.Message(session)
             .textFormat(builder.TextFormat.xml)
@@ -151,9 +156,24 @@ bot.dialog('/фильм', function (session) {
             msg.attachmentLayout(builder.AttachmentLayout.carousel);
         }
 
-        session.send(msg);
+        // builder.Prompts.choice(session, msg, "select:100|select:101|select:102");
+        builder.Prompts.choice(session, msg, choice);
+    })
+}, function (session, results) {
+    var action, item;
+    var kvPair = results.response.entity.split(':');
+    switch (kvPair[0]) {
+        case 'select':
+            action = 'selected';
+            break;
+    }
+
+    let filmId = kvPair[1];
+
+    bridge.getTorrent(filmId).then(torrents => {
+        let tor = torrents;
     });
-});
+}]);
 
 bot.dialog('/жанры', function (session) {
     let msg = 'Доступные жанры:';

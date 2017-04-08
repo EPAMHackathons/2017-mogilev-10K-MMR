@@ -23,10 +23,6 @@ module.exports.filter = (films) => {
         addFilmIntoResult(results, dvdRip, "DVDRip");
     }
 
-    let webDL = getFilmByQuality(filteredFimls, "WEB-DL");
-    if (webDL) {
-        addFilmIntoResult(results, webDL, "WEB-DL");
-    }
     return results;
 }
 
@@ -54,6 +50,13 @@ function addFilmIntoResult(results, film, quality) {
 }
 
 function addAdditionalTorrents(results) {
+    if (results.length == 0) {
+        let webDL = getFilmByQuality(filteredFimls, "WEB-DL");
+        if (webDL) {
+            addFilmIntoResult(results, webDL, "WEB-DL");
+        }
+    }
+
     if (results.length == 0) {
         let dvd = getFilmByQuality(filteredFimls, "DVD");
         if (dvd) {
