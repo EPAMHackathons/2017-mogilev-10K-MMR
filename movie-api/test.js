@@ -1,6 +1,6 @@
 let api = require('./movie-api');
 
-api.getFilms({ name: 'Социальная сеть' })
+api.getFilms({ name: 'Звездные войны' })
   .then((data) => {
     console.log(data);
   }, (err) => {
@@ -20,6 +20,13 @@ api.getSimilar(37799)
   });
 
 api.getAllGenres()
+  .then((data) => {
+    console.log(data);
+  });
+
+api.getFilms({
+  with_genres: [12, 28]
+})
   .then((data) => {
     console.log(data);
   });

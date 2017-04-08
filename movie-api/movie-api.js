@@ -28,7 +28,7 @@ function movieApi() {
       url = urlGenerator.getFilmsUrlById(params.id);
     }
     if (url.length === 0) {
-      url.urlGenerator.getFilmsByParams(params);
+      url = urlGenerator.getFilmsByParams(params);
     }
     return callHttp(url);
   }

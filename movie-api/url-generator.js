@@ -8,8 +8,7 @@ function UrlGenerator() {
   }
 
   self.getFilmsUrlById = function (id) {
-    let parse = String(id);
-    return getUrl('movie', parse);
+    return getUrl(`movie/${id}`, '');
   }
 
   self.getAllGenresUrl = function () {
@@ -22,14 +21,17 @@ function UrlGenerator() {
 
   self.getFilmsByParams = function (params) {
     let parsed = 'sort_by=vote_average.desc&';
-    let genres = params.with_genres.forEach((x, index) => {
-      genres += String(x);
-      if (index !== params.with_genres.length - 1) {
-        genres += '|';
-      }
-    });
-    genres = encodeURI(genres);
-    parsed += genres;
+    if (params.with_genres) {
+      let genres = '';
+      params.with_genres.forEach((x, index) => {
+        genres += String(x);
+        if (index !== params.with_genres.length - 1) {
+          genres += '|';
+        }
+      });
+      genres = encodeURI(genres);
+      parsed += genres;
+    }
 
     return getUrl('discover/movie', parsed);
   }
