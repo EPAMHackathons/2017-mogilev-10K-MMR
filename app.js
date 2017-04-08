@@ -1,1 +1,1 @@
-require('./bot/app');
+require('./messages/index');
