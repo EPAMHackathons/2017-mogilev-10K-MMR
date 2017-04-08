@@ -23,3 +23,15 @@ api.getAllGenres()
   .then((data) => {
     console.log(data);
   });
+
+api.getFilms({
+  with_genres: [12, 28]
+})
+  .then((data) => {
+    console.log(data);
+  });
+
+api.getPeople('Джонни Депп')
+  .then((data) => {
+    console.log(data);
+  });

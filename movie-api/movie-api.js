@@ -34,6 +34,16 @@ function movieApi() {
     return callHttp(url);
   }
 
+  self.getPeople = function (query) {
+    let url = urlGenerator.getPeopleUrl(query);
+    return callHttp(url);
+  }
+
+  self.getAllGenres = function () {
+    let url = urlGenerator.getAllGenresUrl();
+    return callHttp(url);
+  }
+
   return self;
 
 }
