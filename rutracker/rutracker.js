@@ -23,15 +23,5 @@ module.exports = {
             console.log(err);
             return [];
         })
-    },
-
-    getProducer: function (filmInfo) {
-        if (filmInfo.creds && filmInfo.creds.crew) {
-            let producers = filmInfo.creds.crew.filter(cred => cred.job == "Director");
-            if (producers && producers.length == 1) {
-                return producers.name.substring(producers.name.lastIndexOf(" ") + 1);
-            }
-        }
     }
-
 }

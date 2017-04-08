@@ -169,8 +169,14 @@ bot.dialog('/фильм', [function (session) {
 
     let filmId = kvPair[1];
 
-    bridge.getTorrent(filmId).then(torrents => {
-        let tor = torrents;
+    bridge.getTorrents(filmId).then(torrents => {
+        let msg = '';
+
+        torrents.forEach(t => {
+            msg = msg.concat(`Качество: ${t.quality}, размер: ${t.data.size}, ссылка: ${t.data.url}, сиды: ${t.data.seeds}\n\n`)
+        });
+
+        builder.Prompts.text(session, msg);
     });
 }]);
 

@@ -110,8 +110,19 @@ module.exports = {
         return movieApi.getFilms({
             id
         }).then(filmInfo => {
-            return rutracker.getTorrents(filmInfo.title, filmInfo.release_date.clice(0, 4), '');
+            let producer = getProducer(filmInfo);
+            return rutracker.getTorrents(filmInfo.title, filmInfo.release_date.slice(0, 4), producer);
         });
     }
 
 };
+
+
+let getProducer = (filmInfo) => {
+    if (filmInfo.credits && filmInfo.credits.crew) {
+        let producers = filmInfo.credits.crew.filter(cred => cred.job == "Director");
+        if (producers && producers.length == 1) {
+            return producers[0].name.substring(producers[0].name.lastIndexOf(" ") + 1);
+        }
+    }
+}
