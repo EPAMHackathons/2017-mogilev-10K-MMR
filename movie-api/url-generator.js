@@ -2,7 +2,7 @@ function UrlGenerator() {
   let self = this;
 
   self.getFilmsUrlByName = function (name) {
-    name.replace(' ', '%20');
+    name = encodeURI(name);
     let parse = `query=${name}`;
     return getUrl('search/movie', parse);
   }
@@ -18,6 +18,20 @@ function UrlGenerator() {
 
   self.getSimilarUrl = function (id) {
     return getUrl(`movie/${id}/similar`, '');
+  }
+
+  self.getFilmsByParams = function (params) {
+    let parsed = 'sort_by=vote_average.desc&';
+    let genres = params.with_genres.forEach((x, index) => {
+      genres += String(x);
+      if (index !== params.with_genres.length - 1) {
+        genres += '|';
+      }
+    });
+    genres = encodeURI(genres);
+    parsed += genres;
+
+    return getUrl('discover/movie', parsed);
   }
 
   return self;
