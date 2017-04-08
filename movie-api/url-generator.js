@@ -19,7 +19,7 @@ function UrlGenerator() {
   }
 
   self.getFilmsByParams = function (params) {
-    let parsed = 'sort_by=vote_average.desc&';
+    let parsed = 'sort_by=vote_average.avg&';
     if (params.with_genres) {
       let genres = '';
       params.with_genres
@@ -27,13 +27,14 @@ function UrlGenerator() {
       parsed += genres;
     }
 
-    parsed += parseParamsArray(params.with_genres);
-    parsed += parseParamsArray(params.with_people);
+    parsed += parseParamsArray(params.with_genres, "with_genres");
+    parsed += parseParamsArray(params.with_people, "with_people");
 
-    function parseParamsArray(arr) {
+    function parseParamsArray(arr,paramName ) {
       let result = "";
       if (arr && arr.length > 0) {
         arr.forEach((x, index) => {
+          result += paramName + "=";
           result += String(x);
           if (index !== arr.length - 1) {
             result += '|';
