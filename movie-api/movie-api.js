@@ -1,5 +1,5 @@
 let mockFilms = require('./mock-films');
-let urlGenerator = require('./url-generator')
+let urlGenerator = require('./url-generator');
 let Tmdb = require('movie-api').Tmdb;
 let http = require('http');
 
