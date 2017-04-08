@@ -8,7 +8,9 @@ function callHttp(url) {
       if (error) {
         reject(error);
       } else {
-        resolve(body);
+        let response = JSON.parse(body);
+        response.storage_host_url = 'https://image.tmdb.org/t/p/w640/';
+        resolve(response);
       }
     });
   });
