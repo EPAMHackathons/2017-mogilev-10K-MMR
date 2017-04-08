@@ -1,31 +1,16 @@
-let mockFilms = require('./mock-films');
 let urlGenerator = require('./url-generator');
-let Tmdb = require('movie-api').Tmdb;
 let http = require('http');
-
-const tmdb = new Tmdb({
-  apiKey: '99352ad2ce3f3332250b88df593c863a',
-  language: 'ru'
-});
-
-const getDefaultOptions = () => {
-  return {
-    path: '',
-    method: 'GET'
-  }
-}
+let request = require('request');
 
 function callHttp(url) {
   return new Promise((resolve, reject) => {
-    let options = getDefaultOptions();
-    options.path = url;
-    http.request(options, function (res) {
-      if (res.statusCode == '200') {
-        resolve(res);
+    request(url, (error, response, body) => {
+      if (error) {
+        reject(error);
       } else {
-        reject('HTTP code is ' + res.statusCode);
+        resolve(body);
       }
-    })
+    });
   });
 }
 
@@ -45,6 +30,11 @@ function movieApi() {
 
   self.getAllGenres = function () {
     let url = urlGenerator.getAllGenresUrl();
+    return callHttp(url);
+  }
+
+  self.getSimilar = function (id) {
+    let url = urlGenerator.getSimilarUrl(id);
     return callHttp(url);
   }
 
