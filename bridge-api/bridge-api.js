@@ -115,6 +115,10 @@ module.exports = {
         });
     },
 
+    getSimilar: (id)=>{
+        return movieApi.getSimilar(id);
+    },
+
     searchMovies: (people, genres) => {
         return movieApi.getAllGenres().then((loadedGenres) => {
             let queryPersons = [];

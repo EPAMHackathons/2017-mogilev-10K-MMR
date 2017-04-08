@@ -68,6 +68,10 @@ bot.beginDialogAction('фильм', '/фильм', {
     matches: /^фильм/i
 });
 
+bot.beginDialogAction('похожее', '/похожее', {
+    matches: /^похожее/i
+});
+
 bot.beginDialogAction('порекомендуй', '/порекомендуй', {
     matches: /^порекомендуй/i
 });
@@ -249,6 +253,50 @@ bot.dialog('/жанры', function (session) {
 }).triggerAction({
     matches: /^жанры/i
 });
+//похожие на социальная сеть
+bot.dialog('/похожее', [function (session) {
+    let filmName = (session.message.text.toLowerCase().slice(8, session.message.text.length));
+    getSimilar(filmName, session);
+}]);
+
+function getSimilar(filmName, session) {
+    bridgeApi.getMovies({
+        name: filmName
+    }).then((queryFilms) => {
+        if (queryFilms.results && queryFilms.results.length == 1) {
+            return bridgeApi.getSimilar(queryFilms.results[0].id);
+        }
+
+    }).then((films) => {
+        let choice = '';
+        let attachments = films.results.map((film) => {
+            choice = choice.concat(`${film.title} (${film.id})|`);
+
+            return new builder.HeroCard(session)
+                .title(film.title)
+                .text(`Описание: ${ (film.overview? film.overview.slice(0, 40): "нету")}...`)
+                .images([
+                    builder.CardImage.create(session, films.storage_host_url + film.poster_path)
+                ])
+                .buttons([
+                    builder.CardAction.imBack(session, `${film.title} (${film.id})`, "Список торрентов"),
+                    builder.CardAction.imBack(session, `${film.title} (${film.id})`, "Похожие фильмы")
+                ]);
+        });
+
+        choice = choice.slice(0, choice.length - 1);
+
+        let msg = new builder.Message(session)
+            .textFormat(builder.TextFormat.xml)
+            .attachments(attachments);
+
+        if (films.results.length > 1) {
+            msg.attachmentLayout(builder.AttachmentLayout.carousel)
+        }
+
+        builder.Prompts.choice(session, msg, choice);
+    })
+}
 
 /**
  * @param {string} filmName 
