@@ -10,7 +10,7 @@ module.exports = {
         return Promise.resolve(true).then(() => {
             return rutrackerApi.login(userName, pass);
         }).then(() => {
-            let query = title + ' ' + year + ' ' + producer;
+            let query = title + ' ' + year + ' ' + (producer ? producer : "");
             return rutrackerApi.search(query);
         }).then(filmsSource => {
             if (filmsSource) {
