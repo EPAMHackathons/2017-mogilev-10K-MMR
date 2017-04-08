@@ -12,6 +12,7 @@
   "dependencies": {
     "botbuilder": "^3.7.0",
     "movie-api": "^0.14.4",
-    "restify": "^4.3.0"
+    "restify": "^4.3.0",
+    "rutracker-api": "^0.2.0"
   }
 }
