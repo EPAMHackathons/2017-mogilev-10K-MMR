@@ -125,12 +125,12 @@ bot.dialog('/помощь', [
 ]).triggerAction({
     matches: /^помощь|помоги|cписок команд|команды/i
 });
-
+// фильм терминатор
 bot.dialog('/фильм', function (session) {
-    let filmName = (session.message.text.toLowerCase().slice(5, session.message.text.length));
+    let filmName = (session.message.text.toLowerCase().slice(6, session.message.text.length));
 
     bridge.getMovies(filmName).then((films) => {
-        let attachments = films.map((film) => {
+        let attachments = films.results.map((film) => {
             return new builder.HeroCard(session)
                 .title(film.title)
                 .subtitle('Оригинальное название: ' + film.original_title)
