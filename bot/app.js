@@ -68,6 +68,10 @@ bot.beginDialogAction('фильм', '/фильм', {
     matches: /^фильм/i
 });
 
+bot.beginDialogAction('порекомендуй', '/порекомендуй', {
+    matches: /^порекомендуй/i
+});
+
 //=========================================================
 // Bots Dialogs
 //=========================================================
@@ -128,6 +132,60 @@ bot.dialog('/помощь', [
 ]).triggerAction({
     matches: /^помощь|помоги|cписок команд|команды/i
 });
+
+// фильм терминатор
+// фильм социальная сеть
+// порекомендуй боевик
+bot.dialog('/порекомендуй', [function (session) {
+    let genre = (session.message.text.toLowerCase().slice(13, session.message.text.length));
+    let choice = '';
+
+    bridgeApi.searchMovies([], [genre]).then((films) => {
+        let attachments = films.results.map((film) => {
+            choice = choice.concat(`${film.title} (${film.id})|`);
+
+            return new builder.HeroCard(session)
+                .title(film.title)
+                .text(`Описание: ${film.overview.slice(0, 40)}...`)
+                .images([
+                    builder.CardImage.create(session, films.storage_host_url + film.poster_path)
+                ])
+                .buttons([
+                    builder.CardAction.imBack(session, `${film.title} (${film.id})`, "Список торрентов")
+                ]);
+        });
+
+        choice = choice.slice(0, choice.length - 1);
+
+        let msg = new builder.Message(session)
+            .textFormat(builder.TextFormat.xml)
+            .attachments(attachments);
+
+        if (films.results.length > 1) {
+            msg.attachmentLayout(builder.AttachmentLayout.carousel)
+        }
+
+        builder.Prompts.choice(session, msg, choice);
+    })
+}, function (session, results) {
+    var action, item;
+
+    let filmName = results.response.entity;
+    let splitedName = filmName.split(' ');
+    let filmId = splitedName[splitedName.length - 1].slice(1, splitedName[splitedName.length - 1].length - 1);
+
+    bridgeApi.getTorrents(filmId).then(torrents => {
+        let msg = '';
+
+        torrents.forEach(t => {
+            msg = msg.concat(`Качество: ${t.quality}, размер: ${t.data.size}, ссылка: ${t.data.url}, сиды: ${t.data.seeds}\n\n`)
+        });
+
+        session.endConversation(msg);
+    });
+}]);
+
+
 // фильм терминатор
 // фильм социальная сеть
 bot.dialog('/фильм', [function (session) {
