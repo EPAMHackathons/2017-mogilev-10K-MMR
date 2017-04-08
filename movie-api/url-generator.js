@@ -43,7 +43,7 @@ function getUrl(searchAction, query) {
   if (query && query.length > 0 && query[query.length - 1] !== '&') {
     query = `${query}&`
   }
-  let template = `https://api.themoviedb.org/3/${searchAction}?api_key=99352ad2ce3f3332250b88df593c863a&${query}language=ru`;
+  let template = `https://api.themoviedb.org/3/${searchAction}?api_key=99352ad2ce3f3332250b88df593c863a&${query}language=ru&append_to_response=credits`;
   return template;
 }
 
