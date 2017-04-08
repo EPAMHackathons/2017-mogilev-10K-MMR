@@ -1,8 +1,12 @@
+let movieApi = require('../movie-api/movie-api');
+
 module.exports = {
-    getMovies: () => {
-        return true;
+    getMovies: (movieName) => {
+        return movieApi.getFilms({
+            name: movieName
+        });
     },
-    
+
     getSimilarMovies: () => {
         return true;
     }

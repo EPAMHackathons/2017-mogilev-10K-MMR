@@ -1,5 +1,6 @@
 var restify = require('restify');
 var builder = require('botbuilder');
+var bridge = require('../bridge-api/bridge-api');
 //=========================================================
 // Bot Setup
 //=========================================================
@@ -89,7 +90,8 @@ bot.dialog('/', [
         session.send("Ok... See you later!");
     }
 ]);
-
+// session.message.agent
+// session.message.user.id||name
 bot.dialog('/меню', [
     function (session) {
         let userMessage = session.message.text.toLowerCase();
@@ -127,39 +129,40 @@ bot.dialog('/помощь', [
 bot.dialog('/фильм', function (session) {
     let filmName = (session.message.text.toLowerCase().slice(5, session.message.text.length));
 
-    let films = getFilms(filmName);
+    bridge.getMovies(filmName).then((films) => {
+        let attachments = films.map((film) => {
+            return new builder.HeroCard(session)
+                .title(film.title)
+                .subtitle('Оригинальное название: ' + film.original_title)
+                .text(film.overview)
+                .images([
+                    builder.CardImage.create(session, film.poster_path)
+                ])
+                .buttons([
+                    builder.CardAction.openUrl(session, "http://onlinemultfilmy.ru/lego-zvezdnye-vojny-xroniki-jody/", "Скачать Торрент"),
+                ])
+        });
 
-    let attachments = films.map((film) => {
-        return new builder.HeroCard(session)
-            .title(film.title)
-            .subtitle('Оригинальное название: ' + film.original_title)
-            .text(film.overview)
-            .images([
-                builder.CardImage.create(session, film.poster_path)
-            ])
-            .buttons([
-                builder.CardAction.openUrl(session, "http://onlinemultfilmy.ru/lego-zvezdnye-vojny-xroniki-jody/", "Скачать Торрент"),
-            ])
+        let msg = new builder.Message(session)
+            .textFormat(builder.TextFormat.xml)
+            .attachments(attachments);
+
+        if (films.length > 1) {
+            msg.attachmentLayout(builder.AttachmentLayout.carousel);
+        }
+
+        session.send(msg);
     });
-
-    let msg = new builder.Message(session)
-        .textFormat(builder.TextFormat.xml)
-        .attachments(attachments);
-
-    if (films.length > 1) {
-        msg.attachmentLayout(builder.AttachmentLayout.carousel);
-    }
-
-    session.send(msg);
 });
 
 bot.dialog('/жанры', function (session) {
     let msg = 'Доступные жанры:';
-    let genres = getGenres().map(g => g.name);
 
-    genres.forEach(name => msg = msg.concat(`\n\n${name}`));
+    getGenres().then(genres => {
+        genres.map(g => g.name).forEach(name => msg = msg.concat(`\n\n${name}`));
+        builder.Prompts.text(session, msg);
+    })
 
-    builder.Prompts.text(session, msg);
 }).triggerAction({
     matches: /^жанры/i
 });
@@ -168,7 +171,7 @@ bot.dialog('/жанры', function (session) {
  * @param {string} filmName 
  */
 let getFilms = (filmName) => {
-    return [{
+    let films = [{
         "poster_path": "https://image.tmdb.org/t/p/w640/ikUhOSuKOd9Sjf6dVP585lFtiLb.jpg",
         "adult": false,
         "overview": "Во времена гражданской войны Галактическая империя угрожала подавить народное восстание с помощью совершенного оружия: Звезды смерти. Принцесса Лиа и повстанческий альянс одержали важную победу, но праздновать некогда. Чтобы избежать преследования за уничтожение Звезды смерти они принимают решение эвакуироваться на секретную базу, которая находится на Хоте…",
@@ -189,14 +192,13 @@ let getFilms = (filmName) => {
         "vote_count": 11,
         "video": false,
         "vote_average": 5.9
-    }]
+    }];
+
+    return new Promise(resolve => resolve(films));
 }
 
-/**
- * 
- */
 let getGenres = () => {
-    return [{
+    let genres = [{
             "id": 28,
             "name": "боевик"
         },
@@ -272,5 +274,7 @@ let getGenres = () => {
             "id": 37,
             "name": "вестерн"
         }
-    ]
+    ];
+
+    return new Promise(resolve => resolve(genres));
 }
