@@ -7,7 +7,7 @@ var botbuilder_azure = require("botbuilder-azure");
 var useEmulator = (process.env.NODE_ENV == 'development');
 
 var connector = useEmulator ? new builder.ChatConnector() : new botbuilder_azure.BotServiceConnector({
-    ppId: process.env.MICROSOFT_APP_ID,
+    appId: process.env.MICROSOFT_APP_ID,
     appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
 

@@ -6,14 +6,20 @@ var bridgeApi = require('../bridge-api/bridge-api');
 //=========================================================
 // Setup Restify Server
 var server = restify.createServer();
-server.listen(process.env.port || process.env.PORT || 8080, function () {
+server.listen(process.env.port || process.env.PORT || 3978, function () {
     console.log('%s listening to %s', server.name, server.url);
 });
 // Create chat bot
 var connector = new builder.ChatConnector({
-    appId: "420370ab-6e82-4287-af5d-3920fbfd59f7",
-    appPassword: "URDKo7QkbQXkm6FFqCk4nb9"
+    appId: process.env.MICROSOFT_APP_ID,
+    appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
+
+// var connector = new builder.ChatConnector({
+//     appId: "420370ab-6e82-4287-af5d-3920fbfd59f7",
+//     appPassword: "URDKo7QkbQXkm6FFqCk4nb9"
+// });
+
 var bot = new builder.UniversalBot(connector);
 server.post('/api/messages', connector.listen());
 //Bot on
@@ -424,9 +430,9 @@ let getGenres = () => {
 //     console.log(response);
 // });
 
-bridgeApi.getUserData(1, 2).then(result => {
-    console.log(result);
-});
+// bridgeApi.getUserData(1, 2).then(result => {
+//     console.log(result);
+// });
 
 // bridgeApi.removeUserData(1, 2).then(result => {
 //     console.log(result);
