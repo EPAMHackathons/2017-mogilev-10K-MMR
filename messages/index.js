@@ -446,9 +446,9 @@ let getGenres = () => {
 //     console.log(response);
 // });
 
-bridgeApi.getUserData(1, 2).then(result => {
-    console.log(result);
-});
+// bridgeApi.getUserData(1, 2).then(result => {
+//     console.log(result);
+// });
 
 // bridgeApi.removeUserData(1, 2).then(result => {
 //     console.log(result);
